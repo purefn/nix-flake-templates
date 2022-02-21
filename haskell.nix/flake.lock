@@ -101,11 +101,11 @@
     },
     "flake-utils": {
       "locked": {
-        "lastModified": 1638122382,
-        "narHash": "sha256-sQzZzAbvKEqN9s0bzWuYmRaA03v40gaJ4+iL1LXjaeI=",
+        "lastModified": 1642700792,
+        "narHash": "sha256-XqHrk7hFb+zBvRg6Ghl+AZDq03ov6OshJLiSWOoX5es=",
         "owner": "numtide",
         "repo": "flake-utils",
-        "rev": "74f7e4319258e287b0f9cb95426c9853b282730b",
+        "rev": "846b2ae0fc4cc943637d3d1def4454213e203cba",
         "type": "github"
       },
       "original": {
@@ -164,11 +164,11 @@
     "hackage": {
       "flake": false,
       "locked": {
-        "lastModified": 1642813925,
-        "narHash": "sha256-YC6tY9mz1nbHONQugv6/20Tn8eJLHK0ijx3NUU+6/Cw=",
+        "lastModified": 1643764476,
+        "narHash": "sha256-Jx8rnosHvDmSCqwstjIfOUFUMvGJDYqlUR5Lrek9vO4=",
         "owner": "input-output-hk",
         "repo": "hackage.nix",
-        "rev": "a10b0a43b4672fc919c23a9c65002811c3da35ee",
+        "rev": "94448e81a86f8cc679148ab182fe972ee711233c",
         "type": "github"
       },
       "original": {
@@ -190,8 +190,7 @@
         "hpc-coveralls": "hpc-coveralls",
         "nix-tools": "nix-tools",
         "nixpkgs": [
-          "haskellNix",
-          "nixpkgs-2111"
+          "nixpkgs"
         ],
         "nixpkgs-2003": "nixpkgs-2003",
         "nixpkgs-2105": "nixpkgs-2105",
@@ -201,11 +200,11 @@
         "stackage": "stackage"
       },
       "locked": {
-        "lastModified": 1642814073,
-        "narHash": "sha256-dTG11aKY5N3vnq3jX9AqfvE4+ub/TaoAH8VyDwDprlw=",
+        "lastModified": 1643764652,
+        "narHash": "sha256-gluTDdsVDSA5/yjMtOg3LCGk86UraUEL+TR7LC/ljGc=",
         "owner": "input-output-hk",
         "repo": "haskell.nix",
-        "rev": "c11e9ee499a674ef236a6972a0081d920361faae",
+        "rev": "1c23c7e3cb2c719ae212a7bc72a403ae5dae79eb",
         "type": "github"
       },
       "original": {
@@ -367,7 +366,7 @@
         "haskellNix": "haskellNix",
         "nixpkgs": [
           "haskellNix",
-          "nixpkgs"
+          "nixpkgs-2111"
         ],
         "pre-commit-hooks": "pre-commit-hooks"
       }
@@ -375,11 +374,11 @@
     "stackage": {
       "flake": false,
       "locked": {
-        "lastModified": 1642727755,
-        "narHash": "sha256-30kMVckFauVEyzn+k32/0ugvSwK9w8H/Z/+KkJpRuAM=",
+        "lastModified": 1643764602,
+        "narHash": "sha256-aiwoJ1Ut3kGiDwS+D7ujzd7PLmanS2Kfrr5FJzXh4Kg=",
         "owner": "input-output-hk",
         "repo": "stackage.nix",
-        "rev": "c430e00491da7502bf8812719ee7ab61dd035fab",
+        "rev": "ce7bf2a5b014c58f7fdf3220984cf2917c54159b",
         "type": "github"
       },
       "original": {

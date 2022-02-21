@@ -3,6 +3,8 @@
 # instead, we configure them into the `devShell` directory so that
 # we can reuse the same versions for the pre-commit-hooks
 let
+  index-state = "2022-02-01T00:00:00Z";
+
   # needs these overrides for ghc 9.0.2 so that exceptions and Cabal are reinstallable
   nonReinstallablePkgsModule =
     {
@@ -53,6 +55,8 @@ let
 in
 {
   brittany = {
+    inherit index-state;
+
     version = "latest";
     cabalProject = ''
       packages: .
@@ -61,35 +65,31 @@ in
     modules = [ nonReinstallablePkgsModule ];
   };
   cabal-fmt = {
+    inherit index-state;
+
     version = "latest";
     # Punt on building cabal-fmt with ghc 9.0.2 for now. It builds with ghc 9.0.2
     # if we use `allow-newer: cabal-fmt:base`, but doesn't build against anything
     # newer than Cabal 3.2.1.0, and Cabal 3.2.1.0 cannot  be built with ghc 9.0.2.
     compiler-nix-name = "ghc8107";
   };
-  cabal-install = "latest";
-  ghcid = "latest";
-  haskell-language-server = {
+  cabal-install = {
+    inherit index-state;
     version = "latest";
-    modules = [
-      {
-        # to compile with support for brittany
-        packages.haskell-language-server.configureFlags = [ "--flags=agpl" ];
-      }
-      nonReinstallablePkgsModule
-    ];
-    pkg-def-extras = [
-      (hackage: {
-        packages = {
-          "Cabal" = (((hackage.Cabal)."3.6.2.0").revisions).default;
-          "fourmolu" = (((hackage.fourmolu)."0.5.0.1").revisions).default;
-          "ghc-lib-parser" = (((hackage.ghc-lib-parser)."9.2.1.20220109").revisions).default;
-          "ormolu" = (((hackage.ormolu)."0.4.0.0").revisions).default;
-        };
-      })
-    ];
+  };
+  ghcid = {
+    inherit index-state;
+    version = "latest";
+  };
+  haskell-language-server = {
+    inherit index-state;
+
+    version = "latest";
+    modules = [ nonReinstallablePkgsModule ];
   };
   hlint = {
+    inherit index-state;
+
     version = "latest";
     modules = [ nonReinstallablePkgsModule ];
   };

@@ -1,0 +1,55 @@
+* github action (copy from warp-hello)
+  * cachix
+  * run materialization and commit
+  * run `nix flake check`
+  * run `nix develop`
+* add precommit hook to check the flake.lock is up to date
+  * should do it for both nix 2.5.1 and nix 2.6.0 because
+    they exhibit slightly different behavior
+
+Pain points
+-----------
+* using the nix flake configuration requires overriding `supported-systems.nix`
+  * the hope was that materialization would fix this problem, but it doesn't
+  * even with materialization, there is a `runCommand` that is done to copy the
+    materialized files around, which means that when you run `nix flake check`,
+    `nix flake show`, `nix build`, or `nix develop`, in order to fully evaluate
+    all the expressions it needs builders (or substitutes) for every platform.
+  * this can be mitigated by having materializtion done in CI and committed.
+    in most cases, that would allow for substitution for all the platforms.
+    e.g. when building on `x86_64-linux` you won't need a remote `x86_64-darwin`
+    builder, you'll get it from the substitutes. this will still pose a problem
+    anytime you change dependencies and need to redo the materialization.
+* ghc 9.0.2
+  * haskell-language-server 1.5.1 doesn't support a bunch of plugins on ghc 9.0.x and higher
+* nix + cabal (+ ghcid)
+  * `nix develop` and `nix-shell` will provide all the dependencies for cabal to build
+    a package. This is great, except when one of those dependencies has a `build-tool-depends`
+    on a Haskell package. In this case, cabal will try and construct a build plan that will
+    build the Haskell package to make the exe available while building the component that needs it.
+    If the `exactDeps` is set to `true` in the haskell.nix shell, it will fail. We can make it succeed
+    by setting `exactDeps` to `false`. This will work, but it means we end up having to build all of
+    the dependencies twice: once by nix when starting the shell, and then again by cabal.
+    This problem can also be seen when you have a multi package project and the package you want
+    to run ghcid for has a `build-tool-depends` on another package in the project.
+  * the only way I've found to work around this issue is to build a nix shell for the specific package
+    you want to work with
+    ```
+    $ nix-shell -E '(import ./. {}).shellFor { packages = ps: [ps.warp-hello]; }'
+    ```
+    and use cabal v1 commands.
+    If `warp-hello` is a package in a multi package project, this will give us a shell that has all
+    the dependencies of `warp-hello`, both external and internal to our project, in the shell. Now we
+    can do iterative development of the package using `cabal v1-build`.
+  * we can also start `ghcid` for the package using `cabal v1-repl` in the directory the package is in.
+    ```
+    # ghcid -C warp-hello -c 'cabal v1-repl'
+    ```
+  * with this solution, we can work on one package at a time with ghcid and only have to build all its
+    dependencies once, with nix. The downside is, if we modify one of the dependencies of the package
+    that is in our project, we have to exit the shell and re-enter it - cabal won't know the source
+    has changed and even if it did wouldn't know how to do anything about it.
+  * either that, or choose to live with both nix and cabal building your dependencies (which may be the
+    only option if the cabal v1 commands are removed)
+
+

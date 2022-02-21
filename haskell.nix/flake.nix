@@ -9,9 +9,13 @@
 
     flake-utils.url = "github:numtide/flake-utils";
 
-    haskellNix.url = "github:input-output-hk/haskell.nix";
+    haskellNix = {
+      url = "github:input-output-hk/haskell.nix";
+      # workaround for nix 2.6.0 bug
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
-    nixpkgs.follows = "haskellNix/nixpkgs";
+    nixpkgs.follows = "haskellNix/nixpkgs-2111";
 
     pre-commit-hooks.url = "github:cachix/pre-commit-hooks.nix";
   };
@@ -30,35 +34,11 @@
           pkgs = import nixpkgs { inherit system config overlays; };
           flake = pkgs.warp-hello-project.flake { };
           hsTools = pkgs.warp-hello-project.tools (import ./nix/haskell/tools.nix);
+          pre-commit = pkgs.callPackage ./nix/pre-commit-hooks.nix { inherit pre-commit-hooks hsTools; };
         in
         nixpkgs.lib.recursiveUpdate flake {
           checks = {
-            pre-commit-check = pre-commit-hooks.lib.${system}.run {
-              src = ./.;
-              hooks =
-                let
-                  excludeMaterialized = {
-                    enable = true;
-                    excludes = [ "nix/haskell/materialized/" ];
-                  };
-                in
-                {
-                  brittany = {
-                    enable = true;
-                    entry = pkgs.lib.mkForce "${hsTools.brittany}/bin/brittany --write-mode=inplace";
-                  };
-                  cabal-fmt = {
-                    enable = true;
-                    entry = pkgs.lib.mkForce "${hsTools.cabal-fmt}/bin/cabal-fmt --inplace";
-                  };
-                  hlint = {
-                    enable = true;
-                    entry = pkgs.lib.mkForce "${hsTools.hlint}/bin/hlint";
-                  };
-                  nix-linter = excludeMaterialized;
-                  nixpkgs-fmt = excludeMaterialized;
-                };
-            };
+            inherit (pre-commit) pre-commit-check;
           } // pkgs.lib.optionalAttrs (system == "x86_64-linux") {
             nixos-integration-test = pkgs.nixosTest {
               inherit system;
@@ -115,15 +95,11 @@
               '';
             in
             flake.devShell.overrideAttrs (attrs: {
-              inherit (self.checks.${system}.pre-commit-check) shellHook;
+              inherit (pre-commit) shellHook;
 
               buildInputs = attrs.buildInputs
               ++ [ update-materialized ]
-              ++ (with pre-commit-hooks.packages.${system}; [
-                nixpkgs-fmt
-                nix-linter
-              ])
-              ++ (builtins.attrValues hsTools);
+              ++ pre-commit.shellBuildInputs;
             });
 
           legacyPackages = pkgs;
@@ -132,7 +108,7 @@
       nixosModules = {
         warp-hello = {
           imports = [ ./nixos/modules/warp-hello.nix ];
-          nixpkgs.overlays = overlays;
+          nixpkgs = { inherit overlays; };
         };
       };
 
