@@ -60,7 +60,7 @@ in
     version = "latest";
     cabalProject = ''
       packages: .
-      allow-newer: multistate:base, data-tree-print:base, butcher:base
+      allow-newer: data-tree-print:base, butcher:base
     '';
     modules = [ nonReinstallablePkgsModule ];
   };
